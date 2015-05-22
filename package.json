@@ -1,0 +1,19 @@
+{
+  "name": "gulp-bower",
+  "version": "0.1.0",
+  "description": "Analyses bower modules and pipes out all the main files, obeying dependency order.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/MasterOfPoppets/gulp-bower.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Gareth Hughes",
+  "license": "ISC",
+  "dependencies": {
+    "gulp-util": "^3.0.4",
+    "toposort": "^0.2.10"
+  }
+}
