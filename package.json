@@ -1,7 +1,7 @@
 {
   "name": "gulp-bower-mf",
   "version": "0.1.0",
-  "description": "",
+  "description": "Takes Bower description files and spits out the main files described in them",
   "main": "index.js",
   "dependencies": {
     "gulp-util": "^3.0.4",
