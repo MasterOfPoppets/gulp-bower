@@ -1,15 +1,13 @@
 {
   "name": "gulp-bower-mf",
-  "version": "0.1.1",
-  "description": "",
+  "version": "0.1.0",
+  "description": "Takes Bower description files and spits out the main files described in them",
   "main": "index.js",
   "dependencies": {
     "gulp-util": "^3.0.4",
     "toposort": "^0.2.10"
   },
-  "devDependencies": {
-    "through2": "^0.6.5"
-  },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
