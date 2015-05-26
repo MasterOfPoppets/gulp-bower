@@ -16,11 +16,11 @@ npm install --save-dev gulp-bower-mf
 
 ```javascript
 var gulp = require('gulp')
-var gulp-bower = require('gulp-bower-mf')
+var bower = require('gulp-bower-mf')
 
 gulp.task('process-bower-files', function () {
 	return gulp.src('./bower_components/**/.bower.json')
-		.pipe(gulp-bower())
+		.pipe(bower())
 		.pipe(gulp.dest('./public')
 })
 ```
