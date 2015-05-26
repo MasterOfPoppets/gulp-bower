@@ -28,8 +28,8 @@ gulp.task('process-bower-files', function () {
 [npm-url]: https://npmjs.org/package/gulp-bower-mf
 [npm-image]: https://badge.fury.io/js/gulp-bower-mf.svg
 
-[travis-url]: http://travis-ci.org/masterofpoppets/gulp-bower
-[travis-image]: https://secure.travis-ci.org/masterofpoppets/gulp-bower.svg?branch=master
+[travis-url]: http://travis-ci.org/MasterOfPoppets/gulp-bower
+[travis-image]: https://secure.travis-ci.org/MasterOfPoppets/gulp-bower.svg?branch=master
 
 [depstat-url]: https://david-dm.org/masterofpoppets/gulp-bower
 [depstat-image]: https://david-dm.org/masterofpoppets/gulp-bower.svg
