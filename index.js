@@ -6,8 +6,13 @@ var	fs = require('fs'),
 module.exports = function (options) {
 	var bowerFiles = {}
 
-	function transform(chunk, encoding, next) {
-		var bowerFile = JSON.parse(chunk.contents.toString('utf8'))
+	function transform(file, encoding, next) {
+		if (file.isNull()) {
+			next()
+			return
+		}
+
+		var bowerFile = JSON.parse(file.contents.toString('utf8'))
 		bowerFiles[bowerFile.name] = bowerFile
 		next()
 	}
