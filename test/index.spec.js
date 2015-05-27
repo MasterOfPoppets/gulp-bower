@@ -19,12 +19,12 @@ describe('gulp-bower', function () {
 		stream.end()
 	})
 
-	it('should pipe out a main file', function (done) {
+	it('should pipe out main files in dependency order', function (done) {
 		gulp.src('./test/fixtures/**/*.json')
 			.pipe(bower())
-			.pipe(assert.length(1))
+			.pipe(assert.length(2))
 			.pipe(assert.first(function (data) {
-				data.contents.toString().should.equal('console.log(\'file1\')')
+				data.contents.toString().should.equal('console.log(\'file2\')')
 			}))
 			.pipe(assert.end(done))
 	})

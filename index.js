@@ -14,8 +14,6 @@ module.exports = function (options) {
 			return
 		}
 
-		console.log(file)
-
 		var bowerFile = JSON.parse(file.contents.toString('utf8'))
 		bowerFiles[bowerFile.name] = bowerFile
 		files[bowerFile.name] = file
