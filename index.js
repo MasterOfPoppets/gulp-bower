@@ -4,7 +4,9 @@ var	fs = require('fs'),
 	through = require('through2')
 
 module.exports = function (options) {
-	var bowerFiles = {}
+	var bowerFiles = {},
+		files = {},
+		options = options || {}
 
 	function transform(file, encoding, next) {
 		if (file.isNull()) {
@@ -12,8 +14,11 @@ module.exports = function (options) {
 			return
 		}
 
+		console.log(file)
+
 		var bowerFile = JSON.parse(file.contents.toString('utf8'))
 		bowerFiles[bowerFile.name] = bowerFile
+		files[bowerFile.name] = file
 		next()
 	}
 
@@ -51,10 +56,10 @@ module.exports = function (options) {
 				mainFiles = [mainFiles]
 			}
 			mainFiles.forEach(function (filepath) {
-				if (options.excluded.indexOf(bowerFile.name) === -1) {
+				if (!options.excluded || options.excluded.indexOf(bowerFile.name) === -1) {
 					self.push(new gutil.File({
 						path: bowerFile.name + '/' + filepath,
-						contents: fs.readFileSync('bower_components/' + bowerFile.name + '/' + filepath)
+						contents: fs.readFileSync(files[bowerFile.name].base + bowerFile.name + '/' + filepath)
 					}))
 				}
 			})

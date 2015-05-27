@@ -1,4 +1,5 @@
 var chai = require('chai'),
+	path = require('path'),
 	gulp = require('gulp'),
 	gutil = require('gulp-util'),
 	assert = require('stream-assert'),
@@ -16,5 +17,15 @@ describe('gulp-bower', function () {
 
 		stream.write(new gutil.File)
 		stream.end()
+	})
+
+	it('should pipe out a main file', function (done) {
+		gulp.src('./test/fixtures/**/*.json')
+			.pipe(bower())
+			.pipe(assert.length(1))
+			.pipe(assert.first(function (data) {
+				data.contents.toString().should.equal('console.log(\'file1\')')
+			}))
+			.pipe(assert.end(done))
 	})
 })
