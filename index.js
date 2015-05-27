@@ -8,6 +8,8 @@ module.exports = function (options) {
 		files = {},
 		options = options || {}
 
+	return through.obj(transform, flush)
+
 	function transform(file, encoding, next) {
 		if (file.isNull()) {
 			next()
@@ -48,6 +50,12 @@ module.exports = function (options) {
 		orderedDependencies = standaloneModules.concat(orderedDependencies)
 
 		orderedDependencies.forEach(function (module) {
+			if (!bowerFiles[module]) {
+				self.emit('error', new gutil.PluginError('gulp-bower-mf', 'Missing dependency ' + module))
+				done()
+				return
+			}
+
 			var bowerFile = bowerFiles[module]
 			var mainFiles = bowerFile.main
 			if (typeof mainFiles === 'string') {
@@ -55,9 +63,13 @@ module.exports = function (options) {
 			}
 			mainFiles.forEach(function (filepath) {
 				if (!options.excluded || options.excluded.indexOf(bowerFile.name) === -1) {
+					var path = files[bowerFile.name].path
+					var pathSubStr = path.substr(0, path.indexOf(bowerFile.name))
+					var file = pathSubStr + bowerFile.name + '/' + filepath
+
 					self.push(new gutil.File({
-						path: bowerFile.name + '/' + filepath,
-						contents: fs.readFileSync(files[bowerFile.name].base + bowerFile.name + '/' + filepath)
+						path: file,
+						contents: fs.readFileSync(file)
 					}))
 				}
 			})
@@ -65,6 +77,4 @@ module.exports = function (options) {
 
 		done()
 	}
-
-	return through.obj(transform, flush)
 }

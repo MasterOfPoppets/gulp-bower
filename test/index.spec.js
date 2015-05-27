@@ -1,5 +1,4 @@
 var chai = require('chai'),
-	path = require('path'),
 	gulp = require('gulp'),
 	gutil = require('gulp-util'),
 	assert = require('stream-assert'),
@@ -27,5 +26,23 @@ describe('gulp-bower', function () {
 				data.contents.toString().should.equal('console.log(\'file2\')')
 			}))
 			.pipe(assert.end(done))
+	})
+
+	it('should pipe out main files without excluded components', function (done) {
+		gulp.src('./test/fixtures/**/*.json')
+			.pipe(bower({
+				excluded: ['testFile1']
+			}))
+			.pipe(assert.length(1))
+			.pipe(assert.end(done))
+	})
+
+	it('should emit an error if a dependency is not available', function (done) {
+		gulp.src('./test/fixtures/testFile1/*.json')
+			.pipe(bower())
+			.on('error', function (error) {
+				error.message.should.equal('Missing dependency testFile2')
+				done()
+			})
 	})
 })
