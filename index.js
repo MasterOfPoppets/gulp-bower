@@ -52,7 +52,6 @@ module.exports = function (options) {
 							return fileContents.name
 						})
 						.toArray(function (x) {
-							console.log(x)
 							if (x.indexOf(dep) === -1) {
 								stream.emit('error', new gutil.PluginError('gulp-bower-mf', 'Missing dependency ' + dep))
 							}
@@ -78,6 +77,7 @@ module.exports = function (options) {
 		function pushFile(fileMeta) {
 			if (!options.excluded || options.excluded.indexOf(fileMeta.name) === -1) {
 				var path = fileMeta.path
+				console.log(path)
 				var pathSubStr = path.substr(0, path.lastIndexOf('\\'))
 				var file = pathSubStr  + '/' + fileMeta.main
 
