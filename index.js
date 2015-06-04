@@ -1,14 +1,15 @@
-var	fs = require('fs'),
+var	_ = require('highland'),
+	fs = require('fs'),
 	gutil = require('gulp-util'),
 	toposort = require('toposort'),
 	through = require('through2')
 
 module.exports = function (options) {
-	var bowerFiles = {},
-		files = {},
-		options = options || {}
+	var stream,
+		options = options || {},
+		fileDescriptors = []
 
-	return through.obj(transform, flush)
+	stream = through.obj(transform, flush)
 
 	function transform(file, encoding, next) {
 		if (file.isNull()) {
@@ -16,65 +17,79 @@ module.exports = function (options) {
 			return
 		}
 
-		var bowerFile = JSON.parse(file.contents.toString('utf8'))
-		bowerFiles[bowerFile.name] = bowerFile
-		files[bowerFile.name] = file
+		fileDescriptors.push(file)
 		next()
 	}
 
 	function flush(done) {
-		var self = this,
-			dependencyGraph = [],
-			standaloneModules = []
-
-		Object.keys(bowerFiles).forEach(function (module) {
-			var bowerFile = bowerFiles[module]
-			if (bowerFile.dependencies) {
-				var moduleDependencyKeys = Object.keys(bowerFile.dependencies)
-
-				moduleDependencyKeys.forEach(function (moduleDependencyKey) {
-					dependencyGraph.push([bowerFile.name, moduleDependencyKey])
-				})
-			} else {
-				standaloneModules.push(bowerFile.name)
-			}
-		})
-
-		var orderedDependencies = toposort(dependencyGraph).reverse()
-		orderedDependencies.forEach(function (dependency) {
-			var standaloneModuleIndex = standaloneModules.indexOf(dependency)
-			if (standaloneModuleIndex !== -1) {
-				standaloneModules.splice(standaloneModuleIndex, 1)
-			}
-		})
-		orderedDependencies = standaloneModules.concat(orderedDependencies)
-
-		orderedDependencies.forEach(function (module) {
-			if (!bowerFiles[module]) {
-				self.emit('error', new gutil.PluginError('gulp-bower-mf', 'Missing dependency ' + module))
-				done()
-				return
-			}
-
-			var bowerFile = bowerFiles[module]
-			var mainFiles = bowerFile.main
-			if (typeof mainFiles === 'string') {
-				mainFiles = [mainFiles]
-			}
-			mainFiles.forEach(function (filepath) {
-				if (!options.excluded || options.excluded.indexOf(bowerFile.name) === -1) {
-					var path = files[bowerFile.name].path
-					var pathSubStr = path.substr(0, path.indexOf(bowerFile.name))
-					var file = pathSubStr + bowerFile.name + '/' + filepath
-
-					self.push(new gutil.File({
-						path: file,
-						contents: fs.readFileSync(file)
-					}))
-				}
+		_(fileDescriptors)
+			.through(parseAllFileContents)
+			.flatMap(function (file) {
+				return _.pairs(_.get('dependencies', file))
+					.map(function (dependency) {
+						return [file.name, dependency[0]]
+					})
 			})
-		})
+			.toArray(function (dependencyGraph) {
+				pushFiles(toposort(dependencyGraph).reverse())
+			})
+
+		function parseAllFileContents(allFiles) {
+			return allFiles
+				.map(_.get('contents'))
+				.map(function (contents) {
+					return contents.toString('utf8')
+				})
+				.map(JSON.parse)
+		}
+
+		function pushFiles(orderedDependencies) {
+			_(orderedDependencies)
+				.each(function (dep) {
+					_(fileDescriptors)
+						.through(parseAllFileContents)
+						.map(function (fileContents) {
+							return fileContents.name
+						})
+						.toArray(function (x) {
+							console.log(x)
+							if (x.indexOf(dep) === -1) {
+								stream.emit('error', new gutil.PluginError('gulp-bower-mf', 'Missing dependency ' + dep))
+							}
+						})
+				})
+
+			_(fileDescriptors)
+				.flatMap(function (file) {
+					return _([file])
+						.through(parseAllFileContents)
+						.map(function (fileContents) {
+							return { path: file.path, name: fileContents.name, main: fileContents.main }
+						})
+				})
+				.sortBy(function (a, b) {
+					return orderedDependencies.indexOf(a.name) > orderedDependencies.indexOf(b.name)
+				})
+				.each(function (file) {
+					pushFile(file)
+				})
+		}
+
+		function pushFile(fileMeta) {
+			if (!options.excluded || options.excluded.indexOf(fileMeta.name) === -1) {
+				var path = fileMeta.path
+				var pathSubStr = path.substr(0, path.lastIndexOf('\\'))
+				var file = pathSubStr  + '/' + fileMeta.main
+
+				stream.push(new gutil.File({
+					path: file,
+					contents: fs.readFileSync(file)
+				}))
+			}
+		}
 
 		done()
 	}
+
+	return stream
 }

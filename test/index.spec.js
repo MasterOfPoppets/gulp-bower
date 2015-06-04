@@ -21,7 +21,7 @@ describe('gulp-bower', function () {
 	it('should pipe out main files in dependency order', function (done) {
 		gulp.src('./test/fixtures/**/*.json')
 			.pipe(bower())
-			.pipe(assert.length(2))
+			.pipe(assert.length(3))
 			.pipe(assert.first(function (data) {
 				data.contents.toString().should.equal('console.log(\'file2\')')
 			}))
@@ -33,7 +33,7 @@ describe('gulp-bower', function () {
 			.pipe(bower({
 				excluded: ['testFile1']
 			}))
-			.pipe(assert.length(1))
+			.pipe(assert.length(2))
 			.pipe(assert.end(done))
 	})
 
