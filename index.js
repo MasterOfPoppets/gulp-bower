@@ -30,9 +30,7 @@ module.exports = function (options) {
 						return [file.name, dependency[0]]
 					})
 			})
-			.toArray(function (dependencyGraph) {
-				pushFiles(toposort(dependencyGraph).reverse())
-			})
+			.toArray(pushFiles)
 
 		function parseAllFileContents(allFiles) {
 			return allFiles
@@ -43,7 +41,9 @@ module.exports = function (options) {
 				.map(JSON.parse)
 		}
 
-		function pushFiles(orderedDependencies) {
+		function pushFiles(dependencyGraph) {
+			var orderedDependencies = toposort(dependencyGraph).reverse()
+
 			_(orderedDependencies)
 				.each(function (dep) {
 					_(fileDescriptors)
@@ -60,6 +60,7 @@ module.exports = function (options) {
 
 			_(fileDescriptors)
 				.flatMap(function (file) {
+					console.log(file.history)
 					return _([file])
 						.through(parseAllFileContents)
 						.map(function (fileContents) {
@@ -69,23 +70,24 @@ module.exports = function (options) {
 				.sortBy(function (a, b) {
 					return orderedDependencies.indexOf(a.name) > orderedDependencies.indexOf(b.name)
 				})
-				.each(function (file) {
-					pushFile(file)
-				})
+				.each(pushFile)
 		}
 
 		function pushFile(fileMeta) {
-			if (!options.excluded || options.excluded.indexOf(fileMeta.name) === -1) {
-				var path = fileMeta.path
-				console.log(path)
-				var pathSubStr = path.substr(0, path.lastIndexOf('\\'))
-				var file = pathSubStr  + '/' + fileMeta.main
+			var mainFiles = typeof fileMeta.main === 'string' ? [fileMeta.main] : fileMeta.main
 
-				stream.push(new gutil.File({
-					path: file,
-					contents: fs.readFileSync(file)
-				}))
-			}
+			mainFiles.forEach(function (mainFile) {
+				if (!options.excluded || options.excluded.indexOf(fileMeta.name) === -1) {
+					var path = fileMeta.path
+					var pathSubStr = path.substr(0, path.indexOf(fileMeta.name))
+					var file = pathSubStr + fileMeta.name + '/' + mainFile
+
+					stream.push(new gutil.File({
+						path: file,
+						contents: fs.readFileSync(file)
+					}))
+				}
+			})
 		}
 
 		done()

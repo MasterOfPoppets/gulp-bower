@@ -19,9 +19,9 @@ describe('gulp-bower', function () {
 	})
 
 	it('should pipe out main files in dependency order', function (done) {
-		gulp.src('./test/fixtures/**/*.json')
+		gulp.src(['./test/fixtures/**/*.json', '!./test/fixtures/testFile3/*.json'])
 			.pipe(bower())
-			.pipe(assert.length(3))
+			.pipe(assert.length(2))
 			.pipe(assert.first(function (data) {
 				data.contents.toString().should.equal('console.log(\'file2\')')
 			}))
@@ -29,10 +29,17 @@ describe('gulp-bower', function () {
 	})
 
 	it('should pipe out main files without excluded components', function (done) {
-		gulp.src('./test/fixtures/**/*.json')
+		gulp.src(['./test/fixtures/**/*.json', '!./test/fixtures/testFile3/*.json'])
 			.pipe(bower({
 				excluded: ['testFile1']
 			}))
+			.pipe(assert.length(1))
+			.pipe(assert.end(done))
+	})
+
+	it('should pipe out all the main files for a given component', function (done) {
+		gulp.src('./test/fixtures/testFile3/*.json')
+			.pipe(bower())
 			.pipe(assert.length(2))
 			.pipe(assert.end(done))
 	})

@@ -1,8 +1,7 @@
 {
   "name": "testFile3",
-  "main": "./file3.js",
-  "dependencies": {
-    "testFile1": "*",
-    "testFile2": "*"
-  }
+  "main": [
+    "./file3a.js",
+    "./file3b.js"
+  ]
 }
