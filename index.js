@@ -60,7 +60,6 @@ module.exports = function (options) {
 
 			_(fileDescriptors)
 				.flatMap(function (file) {
-					console.log(file.history)
 					return _([file])
 						.through(parseAllFileContents)
 						.map(function (fileContents) {

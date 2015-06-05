@@ -1,6 +1,6 @@
 {
   "name": "gulp-bower-mf",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Takes Bower description files and spits out the main files described in them",
   "main": "index.js",
   "dependencies": {
@@ -10,7 +10,7 @@
     "toposort": "^0.2.10"
   },
   "devDependencies": {
-    "chai": "^2.3.0",
+    "chai": "^3.0.0",
     "gulp": "^3.8.11",
     "mocha": "^2.2.5",
     "stream-assert": "^2.0.2"
