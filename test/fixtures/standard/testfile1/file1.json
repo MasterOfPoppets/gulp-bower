@@ -1,0 +1,7 @@
+{
+  "name": "testFile1",
+  "main": "./file1.js",
+  "dependencies": {
+    "testFile2": "*"
+  }
+}

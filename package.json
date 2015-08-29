@@ -1,22 +1,23 @@
 {
   "name": "gulp-bower-mf",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Takes Bower description files and spits out the main files described in them",
   "main": "index.js",
   "dependencies": {
     "gulp-util": "^3.0.4",
     "highland": "^2.5.1",
-    "through2": "^0.6.5",
+    "through2": "^2.0.0",
     "toposort": "^0.2.10"
   },
   "devDependencies": {
-    "chai": "^3.0.0",
-    "gulp": "^3.8.11",
+    "chai": "^3.2.0",
+    "gulp": "^3.9.0",
     "mocha": "^2.2.5",
-    "stream-assert": "^2.0.2"
+    "stream-assert": "^2.0.3",
+    "xo": "^0.7.1"
   },
   "scripts": {
-    "test": "mocha test/**/*spec.js"
+    "test": "xo && mocha test/**/*spec.js"
   },
   "repository": {
     "type": "git",
@@ -24,12 +25,19 @@
   },
   "keywords": [
     "gulp",
-    "bower"
+    "bower",
+    "gulpplugin"
   ],
   "author": "Gareth Hughes",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/MasterOfPoppets/gulp-bower/issues"
   },
-  "homepage": "https://github.com/MasterOfPoppets/gulp-bower"
+  "homepage": "https://github.com/MasterOfPoppets/gulp-bower",
+  "xo": {
+    "envs": [
+      "node",
+      "mocha"
+    ]
+  }
 }

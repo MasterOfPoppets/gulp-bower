@@ -1,0 +1,7 @@
+{
+  "name": "testFile1",
+  "main": [
+    "./file1a.js",
+    "./file1b.js"
+  ]
+}

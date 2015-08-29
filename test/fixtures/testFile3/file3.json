@@ -1,7 +1,0 @@
-{
-  "name": "testFile3",
-  "main": [
-    "./file3a.js",
-    "./file3b.js"
-  ]
-}
