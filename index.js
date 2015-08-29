@@ -33,6 +33,7 @@ module.exports = function (passedOptions) {
 			.map(function orderDependencies(dependencyGraph) {
 				return toposort(dependencyGraph).reverse();
 			})
+			.doto(findMissingDependencies)
 			.each(pushFiles);
 
 		done();
@@ -51,9 +52,25 @@ module.exports = function (passedOptions) {
 				.map(JSON.parse);
 		}
 
-		function pushFiles(orderedDependencies) {
-			findMissingDependencies(orderedDependencies);
+		function findMissingDependencies(orderedDependencies) {
+			_(orderedDependencies)
+				.each(function (dependency) {
+					return parsedFiledDescriptors()
+						.map(_.get('name'))
+						.collect()
+						.filter(function (allFileNames) {
+							return allFileNames.indexOf(dependency) === -1;
+						})
+						.each(function (fileMissingDependency) {
+							stream.emit('error', new gutil.PluginError(
+								'gulp-bower-mf',
+								'Missing dependency ' + dependency + ' for library ' + fileMissingDependency
+							));
+						});
+				});
+		}
 
+		function pushFiles(orderedDependencies) {
 			_(fileDescriptors)
 				.flatMap(function extractFileMeta(file) {
 					return _([file])
@@ -81,24 +98,6 @@ module.exports = function (passedOptions) {
 								path: file,
 								contents: fs.readFileSync(file)
 							}));
-						});
-				});
-		}
-
-		function findMissingDependencies(orderedDependencies) {
-			_(orderedDependencies)
-				.each(function (dependency) {
-					return parsedFiledDescriptors()
-						.map(_.get('name'))
-						.collect()
-						.filter(function (allFileNames) {
-							return allFileNames.indexOf(dependency) === -1;
-						})
-						.each(function (fileMissingDependency) {
-							stream.emit('error', new gutil.PluginError(
-								'gulp-bower-mf',
-								'Missing dependency ' + dependency + ' for library ' + fileMissingDependency
-							));
 						});
 				});
 		}
